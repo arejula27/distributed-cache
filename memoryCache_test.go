@@ -92,6 +92,17 @@ func TestMemoryCache(t *testing.T) {
 		if len(keys) != 0 {
 			t.Errorf("Expected keys list to be empty, but got %v", keys)
 		}
+		//Add  data
+		key1 := "key1"
+		value1:= "value1"
+		key2 := "key2"
+		value2:= "value2"
+		cache.data[key1]=[]byte(value1)
+		cache.data[key2]=[]byte(value2)
+		keys = cache.GetKeys()
+		if len(keys) != 2 {
+			t.Errorf("Expected keys length list to be two, but got %v", len(keys))
+		}
 	})
 }
 
