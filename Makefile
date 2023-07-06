@@ -1,4 +1,6 @@
-RUN:
-	go run main.go
+run:
+	go run .
 test:
 	go test ./...
+cli:
+	go run client/client.go

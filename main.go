@@ -1,10 +1,10 @@
 // Entrypoint fot the cache
 package main
 
-import "fmt"
+import "log"
 
 func main() {
 
-	fmt.Println("Hellow")
-
+	s := NewServer()
+	log.Fatalln(s.Start())
 }

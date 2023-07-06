@@ -29,32 +29,32 @@ func (c *MemoryCache) Get(key string) ([]byte, error) {
 	return value, nil
 }
 
-func (c *MemoryCache)Set(key string,value []byte) error{
+func (c *MemoryCache) Set(key string, value []byte) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
-	c.data[key]=value
+	c.data[key] = value
 	return nil
 }
-func(c *MemoryCache)	Delete(key string) error{
+func (c *MemoryCache) Delete(key string) error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
-	delete(c.data,key)
+	delete(c.data, key)
 	return nil
 }
-func(c *MemoryCache)	HasKey(key string) bool{
+func (c *MemoryCache) HasKey(key string) bool {
 	c.mtx.RLock()
 	defer c.mtx.RUnlock()
-	_,ok := c.data[key]
+	_, ok := c.data[key]
 	return ok
 }
-func(c *MemoryCache)	GetKeys()[]string{
+func (c *MemoryCache) GetKeys() []string {
 	c.mtx.RLock()
 	defer c.mtx.RUnlock()
-	keysList :=make([]string,0)
+	keysList := make([]string, 0)
 	for key := range c.data {
-		
-		keysList= append(keysList,key )
-        
-    }
+
+		keysList = append(keysList, key)
+
+	}
 	return keysList
 }
