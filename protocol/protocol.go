@@ -41,9 +41,11 @@ func CreateGetRequest(key []byte) *GetRequest {
 		key: key,
 	}
 }
-
+func (r GetRequest) Key() string {
+	return string(r.key)
+}
 func (r GetRequest) Serialize() []byte {
-	//Creation of the buffer where we sill store the
+	//Creation of the buffer where we will store the
 	//serialized GetRequest
 	result := new(bytes.Buffer)
 	//Write the kind of request: CMD_GET

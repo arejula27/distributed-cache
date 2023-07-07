@@ -16,23 +16,22 @@ type Server struct {
 func (s *Server) handleConnection(conn net.Conn) {
 	//It is possibe to read and write from the connection
 	defer conn.Close()
-	buff := make([]byte, 1024)
-	_, err := conn.Read(buff)
-	if err != nil {
-		log.Printf("error reading buffer: %s\n", err)
-		return
-	}
-	rqt := protocol.NewRequest(buff)
 
-	switch rqt.Action() {
-	case protocol.GET:
-		s.handleGetAction(*rqt)
+	//TODO: loop
+	rqt, err := protocol.ParseAction(conn)
+	if err != nil {
+		log.Println("parse command error:", err)
+	}
+
+	switch typ := rqt.(type) {
+	case *protocol.GetRequest:
+		s.handleGetAction(typ)
 	}
 
 }
 
-func (s *Server) handleGetAction(rqt protocol.Request) {
-	log.Println("Handling GET")
+func (s *Server) handleGetAction(getRqt *protocol.GetRequest) {
+	log.Println("Handling GET. key: ", getRqt.Key())
 }
 
 func (s *Server) Start() error {
