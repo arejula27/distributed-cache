@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net"
+
+	"github.com/arejula27/distributed-cache/protocol"
 )
 
 const TYPE = "tcp"
@@ -21,7 +23,8 @@ func main() {
 
 	}
 	log.Println("connection succes")
-	_, err = conn.Write([]byte("This is a message"))
+	msg := protocol.CreateGetRequest([]byte("hola"))
+	_, err = conn.Write(msg.Serialize())
 	if err != nil {
 		log.Fatalln("Write data failed:", err.Error())
 

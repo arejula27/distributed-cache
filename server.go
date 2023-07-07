@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net"
+
+	"github.com/arejula27/distributed-cache/protocol"
 )
 
 // Server handles the cache connections
@@ -20,7 +22,17 @@ func (s *Server) handleConnection(conn net.Conn) {
 		log.Printf("error reading buffer: %s\n", err)
 		return
 	}
-	log.Println("Message received ", string(buff))
+	rqt := protocol.NewRequest(buff)
+
+	switch rqt.Action() {
+	case protocol.GET:
+		s.handleGetAction(*rqt)
+	}
+
+}
+
+func (s *Server) handleGetAction(rqt protocol.Request) {
+	log.Println("Handling GET")
 }
 
 func (s *Server) Start() error {
