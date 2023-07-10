@@ -20,4 +20,11 @@ func TestProtocol(t *testing.T) {
 		assert.Equal(t, rqt, parsedAction)
 
 	})
+	t.Run("Parse set action", func(t *testing.T) {
+		rqt := protocol.CreateSetRequest([]byte("exampleKey"), []byte("exampleValue"))
+		conn_mock := bytes.NewReader(rqt.Serialize())
+		parsedAction, err := protocol.ParseAction(conn_mock)
+		assert.Nil(t, err)
+		assert.Equal(t, rqt, parsedAction)
+	})
 }

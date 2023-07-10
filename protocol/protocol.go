@@ -24,6 +24,8 @@ func ParseAction(r io.Reader) (any, error) {
 	switch cmd {
 	case CMD_GET:
 		return parseGetCommand(r), nil
+	case CMD_SET:
+		return parseSetCommand(r), nil
 
 	default:
 		return nil, fmt.Errorf("invalid command")
@@ -63,5 +65,56 @@ func parseGetCommand(r io.Reader) *GetRequest {
 	binary.Read(r, binary.LittleEndian, &keyLen)
 	rqt.key = make([]byte, keyLen)
 	binary.Read(r, binary.LittleEndian, &rqt.key)
+	return &rqt
+}
+
+type SetRequest struct {
+	key   []byte
+	value []byte
+}
+type SetResponse struct{}
+
+func CreateSetRequest(key, value []byte) *SetRequest {
+	return &SetRequest{
+		key:   key,
+		value: value,
+	}
+}
+func (r SetRequest) Key() string {
+	return string(r.key)
+}
+func (r SetRequest) Value() string {
+	return string(r.value)
+}
+func (r *SetRequest) Serialize() []byte {
+	//Creation of the buffer where we will store the
+	//serialized GetRequest
+	result := new(bytes.Buffer)
+	//Write the kind of request: CMD_GET
+	binary.Write(result, binary.LittleEndian, CMD_SET)
+	//Write the key
+	keyLen := int32(len(r.key))
+	binary.Write(result, binary.LittleEndian, keyLen)
+	binary.Write(result, binary.LittleEndian, r.key)
+	//Write the value
+	valueLen := int32(len(r.value))
+	binary.Write(result, binary.LittleEndian, valueLen)
+	binary.Write(result, binary.LittleEndian, r.value)
+
+	return result.Bytes()
+}
+func parseSetCommand(r io.Reader) *SetRequest {
+	rqt := SetRequest{}
+	//parse key
+	var keyLen int32
+	binary.Read(r, binary.LittleEndian, &keyLen)
+	rqt.key = make([]byte, keyLen)
+	binary.Read(r, binary.LittleEndian, &rqt.key)
+	//parse value
+	var valueLen int32
+	binary.Read(r, binary.LittleEndian, &valueLen)
+	rqt.value = make([]byte, valueLen)
+	binary.Read(r, binary.LittleEndian, &rqt.value)
+
 	return &rqt
 }
