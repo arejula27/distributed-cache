@@ -23,15 +23,21 @@ func (s *Server) handleConnection(conn net.Conn) {
 		log.Println("parse command error:", err)
 	}
 
-	switch typ := rqt.(type) {
+	switch action := rqt.(type) {
 	case *protocol.GetRequest:
-		s.handleGetAction(typ)
+		s.handleGetAction(action)
+	case *protocol.SetRequest:
+		s.handleSetAction(action)
 	}
 
 }
 
 func (s *Server) handleGetAction(getRqt *protocol.GetRequest) {
 	log.Println("Handling GET. key: ", getRqt.Key())
+}
+
+func (s *Server) handleSetAction(setRqt *protocol.SetRequest) {
+	log.Println("Handling SET. key: ", setRqt.Key())
 }
 
 func (s *Server) Start() error {

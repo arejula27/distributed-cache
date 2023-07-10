@@ -12,7 +12,6 @@ func TestProtocol(t *testing.T) {
 	t.Run("Parse get action", func(t *testing.T) {
 
 		//Create request
-
 		rqt := protocol.CreateGetRequest([]byte("exampleKey"))
 		conn_mock := bytes.NewReader(rqt.Serialize())
 		parsedAction, err := protocol.ParseAction(conn_mock)
