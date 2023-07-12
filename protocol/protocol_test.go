@@ -26,4 +26,7 @@ func TestProtocol(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, rqt, parsedAction)
 	})
+
+	//TODO: parse GetResponse
+	//TODO: parse ErrorResponse
 }
