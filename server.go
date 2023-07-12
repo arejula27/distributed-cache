@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net"
 
@@ -16,24 +17,47 @@ type Server struct {
 func (s *Server) handleConnection(conn net.Conn) {
 	//It is possibe to read and write from the connection
 	defer conn.Close()
+	exit := false
+	for !exit {
 
-	//TODO: loop
-	rqt, err := protocol.ParseAction(conn)
-	if err != nil {
-		log.Println("parse command error:", err)
-	}
+		rqt, err := protocol.ParseAction(conn)
+		if err != nil {
 
-	switch action := rqt.(type) {
-	case *protocol.GetRequest:
-		s.handleGetAction(action)
-	case *protocol.SetRequest:
-		s.handleSetAction(action)
+			switch err {
+			case io.EOF:
+				log.Println("connection closed by client")
+				exit = true
+			default:
+				log.Println("parse command error:", err)
+			}
+
+		}
+
+		switch action := rqt.(type) {
+		case *protocol.GetRequest:
+			response, err := s.handleGetAction(action)
+			if err != nil {
+				errResponse := protocol.ErrorResponse{Error: err}
+				conn.Write(errResponse.Serialize())
+				continue
+			}
+			conn.Write(response.Serialize())
+		case *protocol.SetRequest:
+			s.handleSetAction(action)
+		case *protocol.ExitRequest:
+			exit = true
+		}
 	}
 
 }
 
-func (s *Server) handleGetAction(getRqt *protocol.GetRequest) {
-	log.Println("Handling GET. key: ", getRqt.Key())
+func (s *Server) handleGetAction(getRqt *protocol.GetRequest) (protocol.GetResponse, error) {
+	value, err := s.cache.Get(getRqt.Key())
+	if err != nil {
+		return protocol.GetResponse{}, err
+	}
+	return protocol.GetResponse{Value: value}, nil
+
 }
 
 func (s *Server) handleSetAction(setRqt *protocol.SetRequest) {
